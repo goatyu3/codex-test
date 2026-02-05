@@ -7,6 +7,7 @@ from typing import Dict
 
 import torch
 from PIL import Image
+import matplotlib.pyplot as plt
 
 from datasets import get_transforms
 from models import create_model
@@ -15,7 +16,7 @@ from utils import load_checkpoint, select_device
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Run inference on an image using a trained cat vs. dog classifier.")
-    parser.add_argument("image", type=str, help="Path to the image file.")
+    parser.add_argument("--image", type=str, default="C:/Users/10956/Desktop/picture/wcy.jpg", help="Path to the image file.")
     parser.add_argument(
         "--checkpoint",
         type=str,
@@ -73,5 +74,47 @@ def main() -> None:
         print(f"  {class_name}: {prob.item():.4f}")
 
 
+"与main相比，main2就是为了显示被测试原图片以及标题为预测结果"
+def main2() -> None:
+    args = parse_args()
+    device = select_device(args.device)
+
+    image_path = Path(args.image)
+    if not image_path.exists():
+        raise FileNotFoundError(f"Image not found: {image_path}")
+
+    checkpoint_path = Path(args.checkpoint)
+    model, idx_to_class = load_model(checkpoint_path, device)
+
+    inputs = preprocess_image(image_path, args.image_size).to(device)
+
+    with torch.no_grad():
+        logits = model(inputs)
+        probabilities = torch.softmax(logits, dim=1).squeeze(0)
+
+    top_k = min(args.top_k, probabilities.numel())
+    top_probs, top_indices = torch.topk(probabilities, top_k)
+
+    # Top-1 prediction for title
+    pred_idx = top_indices[0].item()
+    pred_name = idx_to_class[pred_idx]
+    pred_prob = top_probs[0].item()
+
+    print(f"Predictions for {image_path}:")
+    for prob, idx in zip(top_probs, top_indices):
+        class_name = idx_to_class[idx.item()]
+        print(f"  {class_name}: {prob.item():.4f}")
+
+    # Show the tested image with title = predicted class (Top-1)
+    img = Image.open(image_path).convert("RGB")
+    plt.figure()
+    plt.imshow(img)
+    plt.axis("off")
+    plt.title(f"{pred_name} ({pred_prob:.4f})")
+    plt.tight_layout()
+    plt.show()
+
+
+
 if __name__ == "__main__":
-    main()
+    main2()
