@@ -40,11 +40,19 @@ def set_seed(seed: int) -> None:
 
 
 def select_device(device: str | None = None) -> torch.device:
-    """Return a torch.device, preferring CUDA if available."""
+    """Return a torch.device, preferring CUDA, then Apple MPS, then CPU."""
 
     if device:
         return torch.device(device)
-    return torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+    if torch.cuda.is_available():
+        return torch.device("cuda")
+
+    mps_backend = getattr(torch.backends, "mps", None)
+    if mps_backend is not None and mps_backend.is_available():
+        return torch.device("mps")
+
+    return torch.device("cpu")
 
 
 def accuracy_from_logits(logits: torch.Tensor, targets: torch.Tensor) -> float:
