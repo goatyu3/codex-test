@@ -1,4 +1,4 @@
-"""Inference script for the cat vs. dog classifier."""
+"""Inference script for the cat vs. dog classifier. """
 from __future__ import annotations
 
 import argparse

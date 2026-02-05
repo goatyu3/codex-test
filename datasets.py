@@ -1,4 +1,4 @@
-"""Dataset utilities for the cat vs. dog classifier."""
+"""Dataset utilities for the cat vs. dog classifier. """
 from __future__ import annotations
 
 from pathlib import Path

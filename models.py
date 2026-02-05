@@ -1,4 +1,4 @@
-"""Model definitions for the cat vs. dog classifier."""
+"""Model definitions for the cat vs. dog classifier. """
 from __future__ import annotations
 
 from typing import Optional

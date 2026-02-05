@@ -1,4 +1,4 @@
-"""Utility functions for the cat vs. dog classifier project."""
+"""Utility functions for the cat vs. dog classifier project. """
 from __future__ import annotations
 
 import random
