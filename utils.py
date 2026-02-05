@@ -44,10 +44,12 @@ def select_device(device: str | None = None) -> torch.device:
 
     if device:
         return torch.device(device)
+
     if torch.cuda.is_available():
         return torch.device("cuda")
 
-    if torch.backends.mps.is_available():
+    mps_backend = getattr(torch.backends, "mps", None)
+    if mps_backend is not None and mps_backend.is_available():
         return torch.device("mps")
 
     return torch.device("cpu")
