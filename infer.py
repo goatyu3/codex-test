@@ -16,7 +16,7 @@ from utils import load_checkpoint, select_device
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Run inference on an image using a trained cat vs. dog classifier.")
-    parser.add_argument("--image", type=str, default="C:/Users/10956/Desktop/picture/wcy.jpg", help="Path to the image file.")
+    parser.add_argument("--image", type=str, default="/users/ama/Desktop/picture/wcy.jpg", help="Path to the image file.")
     parser.add_argument(
         "--checkpoint",
         type=str,
@@ -26,6 +26,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--device", type=str, default=None, help="Computation device (cpu, cuda, cuda:0, ...).")
     parser.add_argument("--image-size", type=int, default=224, help="Image size used during training.")
     parser.add_argument("--top-k", type=int, default=2, help="Number of top predictions to display.")
+    parser.add_argument("--save-path", type=str, default=None, help="Path to save output image with prediction title.")
+    parser.add_argument("--no-show", action="store_true", default=False, help="Disable interactive image display.")
     return parser.parse_args()
 
 
@@ -112,7 +114,14 @@ def main2() -> None:
     plt.axis("off")
     plt.title(f"{pred_name} ({pred_prob:.4f})")
     plt.tight_layout()
-    plt.show()
+    if args.save_path:
+        output_path = Path(args.save_path)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        plt.savefig(output_path, dpi=150, bbox_inches="tight", pad_inches=0.1)
+        print(f"Saved prediction image to: {output_path}")
+    if not args.no_show:
+        plt.show()
+    plt.close()
 
 
 
